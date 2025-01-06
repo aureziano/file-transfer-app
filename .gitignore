@@ -55,4 +55,4 @@ release.properties
 Thumbs.db
 
 # Minio specific files
- minio_storage/
+minio_storage/
