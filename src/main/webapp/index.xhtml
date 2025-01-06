@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <title>FileTransferApp</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <style>
+        body {
+            background-color: #e0e0e0;
+            /* Cor de fundo */
+        }
+
+        .header {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
+
+        .image-box {
+            text-align: center;
+            margin: 10px;
+            background-color: #ffffff;
+            /* Fundo branco para cada painel */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            flex: 1 1 300px;
+            /* Responsivo */
+        }
+
+        .image-box img {
+            max-width: 200px;
+            max-height: 200px;
+        }
+
+        .responsive-table {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .responsive-table th,
+        .responsive-table td {
+            text-align: left;
+            padding: 8px;
+            word-wrap: break-word;
+            white-space: normal;
+            font-size: 12px;
+            /* Diminuir o tamanho do texto */
+        }
+
+        .responsive-table th {
+            background-color: #f2f2f2;
+        }
+
+        .responsive-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .section-separator {
+            margin: 20px 0;
+            border-top: 1px solid #ccc;
+        }
+
+        .delete-icon {
+            width: 20px;
+            height: 20px;
+            color: #000;
+            /* Cor do ícone */
+        }
+
+        .upload-button {
+            width: auto;
+            display: inline-block;
+            /* padding: 6px 12px; */
+            font-size: 10px;
+            line-height: 1.42857143;
+            color: #333;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+            /* Adiciona um espaço entre o botão e o campo de upload */
+        }
+
+        .upload-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+    </style>
+</h:head>
+<h:body>
+    <h:panelGroup layout="block" class="header">
+        <h:outputText value="File Transfer Application" style="font-size: 24px; font-weight: bold;" />
+    </h:panelGroup>
+    <p:growl id="messages" showDetail="true" />
+    <div class="image-container">
+        <h:panelGroup layout="block" class="image-box">
+            <h:panelGroup layout="block" class="section-title">
+                <h:outputText value="Local Image" />
+            </h:panelGroup>
+            <h:panelGroup layout="block">
+                <h:graphicImage value="/localFileServlet?fileName=#{fileUploadBean.filename}" alt="Local Image" />
+            </h:panelGroup>
+            <h:panelGroup layout="block" class="section-separator"></h:panelGroup>
+            <h:panelGroup layout="block">
+                <h:form enctype="multipart/form-data">
+                    <h:panelGrid columns="2" styleClass="upload-container">
+                        <p:fileUpload id="iflocal" value="#{fileUploadBean.localFile}" mode="simple" />
+                        <p:commandButton value="Upload" action="#{fileUploadBean.uploadLocalFile}"
+                            update="dtlocal messages" process="@this iflocal" styleClass="upload-button" />
+                    </h:panelGrid>
+                    <h:panelGroup layout="block" class="section-separator"></h:panelGroup>
+                    <p:dataTable id="dtlocal" value="#{fileUploadBean.localFiles}" var="fileloc"
+                        styleClass="responsive-table" lazy="false">
+                        <p:column headerText="">
+                            <p:graphicImage value="/localFileServlet?fileName=#{fileloc.nome}" width="50" height="50" />
+                        </p:column>
+                        <p:column headerText="File Name">
+                            <h:outputText value="#{fileloc.nome}" />
+                        </p:column>
+                        <p:column headerText="File Path">
+                            <h:outputText value="#{fileloc.caminho}" />
+                        </p:column>
+                        <p:column headerText="Actions">
+                            <p:commandButton icon="pi pi-trash" action="#{fileUploadBean.deleteLocalFile(fileloc)}"
+                                update="dtlocal messages" style="border: none; background: none; color: #000;" />
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </h:panelGroup>
+        </h:panelGroup>
+        <h:panelGroup layout="block" class="image-box">
+            <h:panelGroup layout="block" class="section-title">
+                <h:outputText value="SFTP Image" />
+            </h:panelGroup>
+            <h:panelGroup layout="block">
+                <h:graphicImage value="/sftpFileServlet?fileName=#{fileUploadBean.filename}" alt="SFTP Image" />
+            </h:panelGroup>
+            <h:panelGroup layout="block" class="section-separator"></h:panelGroup>
+            <h:panelGroup layout="block">
+                <h:form enctype="multipart/form-data">
+                    <h:panelGrid columns="2" styleClass="upload-container">
+                        <p:fileUpload id="ifsftp" value="#{fileUploadBean.sftpFile}" mode="simple" />
+                        <p:commandButton value="Upload" action="#{fileUploadBean.uploadSftpFile}"
+                            update="dtsftp messages" process="@this ifsftp" styleClass="upload-button" />
+                    </h:panelGrid>
+                    <h:panelGroup layout="block" class="section-separator"></h:panelGroup>
+                    <p:dataTable id="dtsftp" value="#{fileUploadBean.sftpFiles}" var="filesftp"
+                        styleClass="responsive-table" lazy="false">
+                        <p:column headerText="">
+                            <p:graphicImage value="/sftpFileServlet?fileName=#{filesftp.nome}" width="50" height="50" />
+                        </p:column>
+                        <p:column headerText="File Name">
+                            <h:outputText value="#{filesftp.nome}" />
+                        </p:column>
+                        <p:column headerText="File Path">
+                            <h:outputText value="#{filesftp.caminho}" />
+                        </p:column>
+                        <p:column headerText="Actions">
+                            <p:commandButton icon="pi pi-trash" action="#{fileUploadBean.deleteSftpFile(filesftp)}"
+                                update="dtsftp messages" style="border: none; background: none; color: #000;" />
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </h:panelGroup>
+        </h:panelGroup>
+        <h:panelGroup layout="block" class="image-box">
+            <h:panelGroup layout="block" class="section-title">
+                <h:outputText value="MinIO Image" />
+            </h:panelGroup>
+            <h:panelGroup layout="block">
+                <h:graphicImage value="/minioFileServlet?fileName=#{fileUploadBean.filename}" alt="MinIO Image" />
+            </h:panelGroup>
+            <h:panelGroup layout="block" class="section-separator"></h:panelGroup>
+            <h:panelGroup layout="block">
+                <h:form enctype="multipart/form-data">
+                    <h:panelGrid columns="2" styleClass="upload-container">
+                        <p:fileUpload id="ifminio" value="#{fileUploadBean.minioFile}" mode="simple" />
+                        <p:commandButton value="Upload" action="#{fileUploadBean.uploadMinioFile}"
+                            update="dtminio messages" process="@this ifminio" styleClass="upload-button" />
+                    </h:panelGrid>
+                    <h:panelGroup layout="block" class="section-separator"></h:panelGroup>
+                    <p:dataTable id="dtminio" value="#{fileUploadBean.minioFiles}" var="fileminio"
+                        styleClass="responsive-table" lazy="false">
+                        <p:column headerText="">
+                            <p:graphicImage value="/minioFileServlet?fileName=#{fileminio.nome}" width="50"
+                                height="50" />
+                        </p:column>
+                        <p:column headerText="File Name">
+                            <h:outputText value="#{fileminio.nome}" />
+                        </p:column>
+                        <p:column headerText="File Path">
+                            <h:outputText value="#{fileminio.caminho}" />
+                        </p:column>
+                        <p:column headerText="Actions">
+                            <p:commandButton icon="pi pi-trash" action="#{fileUploadBean.deleteMinioFile(fileminio)}"
+                                update="dtminio messages" style="border: none; background: none; color: #000;" />
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </h:panelGroup>
+        </h:panelGroup>
+    </div>
+</h:body>
+
+</html>

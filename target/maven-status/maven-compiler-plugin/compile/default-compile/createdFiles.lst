@@ -1,0 +1,12 @@
+app\util\SftpUtil.class
+app\util\ConfigUtil.class
+app\negocio\servlet\LocalFileServlet.class
+app\negocio\servlet\SftpFileServlet.class
+app\negocio\servlet\MinioFileServlet.class
+app\view\FileUploadBean.class
+app\util\MinioUtil.class
+app\negocio\objetos\FileInfo.class
+app\negocio\objetos\Anexo.class
+app\util\FileTransferUtilLocal.class
+app\negocio\servlet\FileServlet.class
+app\negocio\objetos\Foto.class
